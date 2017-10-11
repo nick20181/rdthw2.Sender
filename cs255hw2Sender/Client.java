@@ -1,24 +1,20 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
+package cs255hw2Sender;
 
 import java.io.*;
 import java.net.*;
 
 /**
  *
- * @author nicholas.bohm
+ * @author Nicholas Bohm
+ * @author Dakota Vanwormer
  */
-public class ClientRewrite {
+public class Client {
 
     private Socket socket;
     private InputStream input;
     private OutputStream output;
 
-    public ClientRewrite(String ip, int port) {
+    public Client(String ip, int port) {
         try {
             this.socket = new Socket(ip, port);
             this.input = this.socket.getInputStream();
@@ -29,7 +25,10 @@ public class ClientRewrite {
             ex.printStackTrace();
         }
     }
-
+    /**
+     * sends a packet over the socket.
+     * @param pckt 
+     */
     public void sendPacket(byte[] pckt) {
         try {
             this.output.write(pckt);
@@ -37,7 +36,10 @@ public class ClientRewrite {
             ex.printStackTrace();
         }
     }
-
+    /**
+     * receives the packet over the socket.
+     * @return 
+     */
     public byte[] receivePckt() {
         byte[] toReturn = new byte[1024];
         try {
@@ -47,7 +49,10 @@ public class ClientRewrite {
         }
         return toReturn;
     }
-    
+    /**
+     * gets the inputstream of the socket.
+     * @return 
+     */
     public InputStream getInput(){
         return this.input;
     }

@@ -1,50 +1,64 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
+package cs255hw2Sender;
 
 import java.io.*;
 import java.nio.ByteBuffer;
 
 /**
  *
- * @author nicholas.bohm
+ * @author Nicholas Bohm
+ * @author Dakota Vanwormer
  */
-public class DataHandlerRewrite {
+public class DataHandler {
 
+    private File directory;
     private FileOutputStream fos;
     private FileInputStream fis;
     private ByteArrayOutputStream baos;
 
-    //this.fos = new FileOutputStream(this.directory + fileName);
-    public DataHandlerRewrite(String directory) {
+    /**
+     * Constructs the datahandler for the receiver.
+     * @param directory 
+     */
+    public DataHandler(String directory) {
+        this.setDirectory(directory);
         try {
-            this.fos = new FileOutputStream(directory);
+            this.fos = new FileOutputStream(this.directory + "\\retrived.data");
             this.baos = new ByteArrayOutputStream();
 
         } catch (FileNotFoundException ex) {
         }
     }
-
-    public DataHandlerRewrite(String directory, String fileName) {
+    /**
+     * creates the datahandler for the sender.
+     * @param directory
+     * @param fileName 
+     */
+    public DataHandler(String directory, String fileName) {
         try {
-            this.fis = new FileInputStream(directory);
+            this.setDirectory(directory);
+            this.fis = new FileInputStream(this.directory + "\\" + fileName);
         } catch (FileNotFoundException ex) {
         }
     }
-
-    public DataHandlerRewrite() {
+    /**
+     *  creates the data handler for the packet.
+     */
+    public DataHandler() {
 
     }
-
+    /**
+     * gets the file length from the file that is being sent.
+     * @param fileName
+     * @return 
+     */
     public long getFileLength(String fileName) {
-        File hold = new File(fileName);
-//        System.out.println("hold: " + hold.length());
+        File hold = new File(this.directory + "\\" + fileName);
         return hold.length();
     }
-
+    /**
+     * converts bytes to a file.
+     * @param data 
+     */
     public void ByteToFile(byte[] data) {
         try {
 
@@ -55,7 +69,12 @@ public class DataHandlerRewrite {
             ex.printStackTrace();
         }
     }
-
+    /**
+     * converts a file into bytes of the given size.
+     * @param fileName
+     * @param size
+     * @return 
+     */
     public byte[] FileToByte(String fileName, int size) {
         int counter = 0;
         byte[][] store = new byte[size][1];
@@ -75,7 +94,11 @@ public class DataHandlerRewrite {
         }
         return null;
     }
-
+    /**
+     * converts bytes to ints.
+     * @param convert
+     * @return 
+     */
     public int byteToInt(byte[] convert) {
         ByteBuffer buffer = ByteBuffer.allocate(convert.length);
         for (int i = 0; i != convert.length; i++) {
@@ -84,7 +107,12 @@ public class DataHandlerRewrite {
         buffer.flip();
         return buffer.getInt();
     }
-
+    /**
+     * converts ints to bytes.
+     * @param convert
+     * @param toAllocate
+     * @return 
+     */
     public byte[] intToByte(int convert, int toAllocate) {
         byte[] dst = new byte[toAllocate];
         ByteBuffer buffer = ByteBuffer.allocate(toAllocate);
@@ -92,5 +120,12 @@ public class DataHandlerRewrite {
         buffer.flip();
         buffer.get(dst);
         return dst;
+    }
+    /**
+     * sets the directory of the datahandler.
+     * @param path 
+     */
+    public void setDirectory(String path) {
+        this.directory = new File(path);
     }
 }

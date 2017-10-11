@@ -1,20 +1,16 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
+package cs255hw2Sender;
 
 import java.nio.ByteBuffer;
 import java.util.zip.CRC32;
 
 /**
  *
- * @author nicholas.bohm
+ * @author Nicholas Bohm
+ * @author Dakota Vanwormer
  */
-public class PacketRewrite {
+public class Packet {
 
-    private DataHandlerRewrite dataHandler = new DataHandlerRewrite();
+    private DataHandler dataHandler = new DataHandler();
     private byte[] seqNum = new byte[4];
     private byte[] checkSum = new byte[4];
     private byte[] srcPortNum = new byte[4];
@@ -22,7 +18,7 @@ public class PacketRewrite {
     private byte[] dataLength = new byte[4];
     private byte[] payload = new byte[1004];
 
-    public PacketRewrite(int seqNum, int checkSum, int srcPort, int desPort, byte[] payLoad) {
+    public Packet(int seqNum, int checkSum, int srcPort, int desPort, byte[] payLoad) {
         fillHeader(this.seqNum, seqNum);
         fillHeader(this.srcPortNum, srcPort);
         fillHeader(this.desPortNum, desPort);
@@ -67,49 +63,15 @@ public class PacketRewrite {
         } else {
             return false;
         }
-
-//        ByteBuffer buffer = ByteBuffer.allocate(4);
-//        buffer.put(this.checkSum);
-//        buffer.flip();
-//        int testCheck = buffer.getInt();
-////        System.out.println("Checksum Sender: " + testCheck + " ReceiverChecksum :" + this.makeCheckRecieved());
-//        if (testCheck == this.makeCheckRecieved()) {
-//            return true;
-//        } else {
-//            return false;
-//        }
     }
 
-//    /**
-//     * makes a check sum from a packet with a checksum of zero in the packet.
-//     *
-//     * @return
-//     */
-//    public int makeCheckRecieved() {
-//        CRC32 crc32 = new CRC32();
-//        ByteBuffer buffer = ByteBuffer.allocate(1024);
-//        //loads all fields into one byte array
-//        buffer.put(this.seqNum);
-//        buffer.putInt(0);
-//        buffer.put(this.srcPortNum);
-//        buffer.put(this.desPortNum);
-//        buffer.put(this.dataLength);
-//        if (this.payload.length != 1004) {
-//            buffer.put(paddPayLoad(this.payload));
-//        } else {
-//            buffer.put(this.payload);
-//        }
-//
-//        buffer.flip();
-//        //gets the packet out of the buffer
-//
-//        crc32.update(buffer);
-//        return (int) crc32.getValue();
-//    }
-    public PacketRewrite(byte[] pckt) {
+    /**
+     *
+     * @param pckt
+     */
+    public Packet(byte[] pckt) {
 
         breakPacket(pckt);
-//        System.out.println("packtretwerret: " + this.dataHandler.byteToInt(getDataLength()));
         this.payload = new byte[this.dataHandler.byteToInt(getDataLength())];
         extractPayload(pckt);
 
@@ -182,8 +144,6 @@ public class PacketRewrite {
      */
     public void extractPayload(byte[] pcktContents) {
         ByteBuffer buffer = ByteBuffer.allocate(this.dataHandler.byteToInt(getDataLength()));
-//        System.out.println("test: " + this.dataHandler.byteToInt(getDataLength()));
-        System.out.println("buffer size: " + buffer.capacity());
         int start = 20;
         for (int i = 0; i != dataHandler.byteToInt(getDataLength()); i++) {
 
@@ -194,6 +154,11 @@ public class PacketRewrite {
         buffer.get(this.payload);
     }
 
+    /**
+     * makes a packet from the data given.
+     *
+     * @return
+     */
     public byte[] makePckt() {
         byte[] toReturn = new byte[1024];
         ByteBuffer buffer = ByteBuffer.allocate(1024);
@@ -208,6 +173,11 @@ public class PacketRewrite {
         return toReturn;
     }
 
+    /**
+     * creates a checksum for the packet
+     *
+     * @return
+     */
     private int createChecksum() {
         CRC32 crc32 = new CRC32();
         crc32.update(this.makePckt());
@@ -215,6 +185,12 @@ public class PacketRewrite {
 
     }
 
+    /**
+     * padds the payload of the packet if the packet payload is not 1004.
+     *
+     * @param beforePadd
+     * @return
+     */
     public byte[] paddPayLoad(byte[] beforePadd) {
         ByteBuffer buffer = ByteBuffer.allocate(1004);
         int counter = 0;
@@ -232,7 +208,11 @@ public class PacketRewrite {
         buffer.get(toReturn);
         return toReturn;
     }
-
+    /**
+     * fills the header of the packet with the needed data that is given.
+     * @param target
+     * @param dataToConvert 
+     */
     public void fillHeader(byte[] target, int dataToConvert) {
         if (target == this.seqNum) {
             this.seqNum = dataHandler.intToByte(dataToConvert, 4);
